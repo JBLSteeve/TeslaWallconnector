@@ -1,0 +1,17 @@
+{
+	"id" : "WallConnector",
+	"name" : "WallConnector",
+	"description" : "Plugin pour piloter une borne de charge WallConnector",
+	"licence" : "AGPL",
+	"author" : "Steeve",
+	"require" : "3.2",
+	"category" : "energy",
+	"hasDependency" : false,
+	"hasOwnDeamon" : false,
+	"maxDependancyInstallTime" : 0,
+	"changelog" : "Première version",
+	"documentation" : "Plugin pour récuperer les informations des bornes wallconnector TESLA en ethernet.",
+	"language" : "fr_FR",
+	"compatibility" : ["miniplus","smart","rpi","docker","diy","v4"],
+	"pluginVersion" : "0.1.0"
+}

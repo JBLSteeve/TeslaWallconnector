@@ -1,0 +1,19 @@
+{
+	"id" : "WallConnector",
+	"name" : "WallConnector",
+	"description" : "Plugin pour piloter une borne de charge WallConnector/EmonEVSE",
+	"licence" : "AGPL",
+	"author" : "Sébastien Spangenberger",
+	"require" : "3.2",
+	"category" : "monitoring",
+	"hasDependency" : false,
+	"hasOwnDeamon" : false,
+	"maxDependancyInstallTime" : 0,
+	"changelog" : "https://sattaz.github.io/Jeedom_WallConnector/fr_FR/changelog",
+	"documentation" : "https://sattaz.github.io/Jeedom_WallConnector/fr_FR/",
+	"language" : "fr_FR",
+	"compatibility" : ["miniplus","smart","rpi","docker","diy","v4"],
+	"link" : {
+        	"forum": "https://community.jeedom.com/t/plugin-WallConnector/"
+	}
+}
