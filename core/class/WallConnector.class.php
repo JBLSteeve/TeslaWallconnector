@@ -59,7 +59,7 @@ class WallConnector extends eqLogic {
 			$WallConnector_IP = $this->getConfiguration("IP");
 			$ch = curl_init();
 			           
-              	//Get all other data
+              	//Getjson vital
               	curl_setopt_array($ch, [
   					CURLOPT_URL => 'http://'.$WallConnector_IP.'/api/1/vitals',
   					CURLOPT_RETURNTRANSFER => true,
@@ -72,43 +72,77 @@ class WallConnector extends eqLogic {
   					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 ]);
 				$response = curl_exec($ch);
-	           	$json = json_decode($response, true);
+	           	$json_vital = json_decode($response, true);
+
+              	//Getjson lifetime
+              	curl_setopt_array($ch, [
+  					CURLOPT_URL => 'http://'.$WallConnector_IP.'/api/1/lifetime',
+  					CURLOPT_RETURNTRANSFER => true,
+  					CURLOPT_ENCODING => "",
+  					CURLOPT_MAXREDIRS => 10,
+  					CURLOPT_TIMEOUT => 10,
+  					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                  	CURLOPT_IGNORE_CONTENT_LENGTH => 136,
+  					CURLOPT_CUSTOMREQUEST => 'GET',
+  					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
+                ]);
+				$response = curl_exec($ch);
+	           	$json_lifetime = json_decode($response, true);
 
          
               	// Get WallConnector Temperature
-				$temp = $json['handle_temp_c'];
-				$this->checkAndUpdateCmd('EVSE_Temp', $temp);
+				$handle_temp_c = $json_vital['handle_temp_c'];
+				$this->checkAndUpdateCmd('handle_temp_c', $handle_temp_c);
               
-              	// Get WallConnector Actual Amperes
-				$amperes = $json['currentA_a'];
-          		$this->checkAndUpdateCmd('EVSE_Amperes', $amperes);
+              	// Get WallConnector current in A
+				$currentA_a = $json_vital['currentA_a'];
+          		$this->checkAndUpdateCmd('currentA_a', $currentA_a);
           
-          		// Get WallConnector Volts
-				$volts = $json['grid_v'];
-				$this->checkAndUpdateCmd('EVSE_Volts', $volts);
+          		// Get WallConnector voltage in V
+				$voltageA_v = $json_vital['voltageA_v'];
+				$this->checkAndUpdateCmd('voltageA_v', $voltageA_v);
               
-
+          		// Get WallConnector voltage input in V
+				$grid_v = $json_vital['grid_v'];
+				$this->checkAndUpdateCmd('grid_v', $grid_v);
+				
+				
 				//Get WallConnector Plug State
-				$connectstate = $json['vehicle_connected'];          
-				if ($connectstate == false) {
-					$this->checkAndUpdateCmd('EVSE_Plug', 'Déconnectée');
-				} elseif ($connectstate == true) {
-					$this->checkAndUpdateCmd('EVSE_Plug', 'Connectée');
+				$vehicle_connected = $json_vital['vehicle_connected'];          
+				if ($vehicle_connected == false) {
+					$this->checkAndUpdateCmd('vehicle_connected', 'Déconnectée');
+				} elseif ($vehicle_connected == true) {
+					$this->checkAndUpdateCmd('vehicle_connected', 'Connectée');
 				}
               
           		//Get WallConnector  State
-				$state = $json['contactor_closed'];          
-				if ($state == false) {
-					$this->checkAndUpdateCmd('EVSE_State', 'Déconnectée');
-				} elseif ($state == true) {
-					$this->checkAndUpdateCmd('EVSE_State', 'Connectée');
+				$contactor_closed = $json_vital['contactor_closed'];          
+				if ($contactor_closed == false) {
+					$this->checkAndUpdateCmd('contactor_closed', 'Déconnectée');
+				} elseif ($contactor_closed == true) {
+					$this->checkAndUpdateCmd('contactor_closed', 'Connectée');
 				}
           
 				// Get WallConnector Charge Session in Kwh
-				$chargesession = $json['session_energy_wh'];
-				$this->checkAndUpdateCmd('EVSE_ChargeSession', round($chargesession/1000,2));
+				$session_energy_wh = $json_vital['session_energy_wh'];
+				$this->checkAndUpdateCmd('session_energy_wh', round($session_energy_wh/1000,2));
               
-
+				// Get WallConnector total Charge in Kwh
+				$energy_wh = $json_lifetime['energy_wh'];
+				$this->checkAndUpdateCmd('energy_wh', round($energy_wh/1000,2));
+				
+				// Get WallConnector total time in Charge in s
+				$charging_time_s = $json_lifetime['charging_time_s'];
+				$this->checkAndUpdateCmd('charging_time_s', $charging_time_s);
+				
+				// Get WallConnector time in Charge in s
+				$session_s = $json_vital['session_s'];
+				$this->checkAndUpdateCmd('session_s', $session_s);
+				
+				// Get WallConnector car current in A
+				$vehicle_current_a = $json_vital['vehicle_current_a'];
+          		$this->checkAndUpdateCmd('vehicle_current_a', $vehicle_current_a);
+				
 			log::add('WallConnector', 'debug','Fonction GetData : Récupération des données WallConnector OK !' );
 			return;
 		} catch (Exception $e) {
@@ -133,12 +167,12 @@ class WallConnector extends eqLogic {
     }
 
     public function postSave() {
-		$info = $this->getCmd(null, 'EVSE_Volts');
+		$info = $this->getCmd(null, 'grid_v');
 		if (!is_object($info)) {
 			$info = new WallConnectorCmd();
-			$info->setName(__('Tension : ', __FILE__));
+			$info->setName(__('Tension entrée', __FILE__));
 		}
-		$info->setLogicalId('EVSE_Volts');
+		$info->setLogicalId('grid_v');
 		$info->setEqLogic_id($this->getId());
 		$info->setType('info');
 		$info->setSubType('numeric');
@@ -149,12 +183,28 @@ class WallConnector extends eqLogic {
 		$info->setOrder(1);
 		$info->save();
 		
-		$info = $this->getCmd(null, 'EVSE_Amperes');
+		$info = $this->getCmd(null, 'voltageA_v');
 		if (!is_object($info)) {
 			$info = new WallConnectorCmd();
-			$info->setName(__('Intensité : ', __FILE__));
+			$info->setName(__('Tension', __FILE__));
 		}
-		$info->setLogicalId('EVSE_Amperes');
+		$info->setLogicalId('voltageA_v');
+		$info->setEqLogic_id($this->getId());
+		$info->setType('info');
+		$info->setSubType('numeric');
+		$info->setTemplate('dashboard','line');
+      	$info->setTemplate('mobile','line');
+		$info->setIsHistorized(1);
+		$info->setUnite('V');
+		$info->setOrder(1);
+		$info->save();
+		
+		$info = $this->getCmd(null, 'currentA_a');
+		if (!is_object($info)) {
+			$info = new WallConnectorCmd();
+			$info->setName(__('Intensité', __FILE__));
+		}
+		$info->setLogicalId('currentA_a');
 		$info->setEqLogic_id($this->getId());
 		$info->setType('info');
 		$info->setSubType('numeric');
@@ -167,12 +217,30 @@ class WallConnector extends eqLogic {
 		$info->setOrder(2);
 		$info->save();
 		
-		$info = $this->getCmd(null, 'EVSE_ChargeSession');
+				$info = $this->getCmd(null, 'vehicle_current_a');
 		if (!is_object($info)) {
 			$info = new WallConnectorCmd();
-			$info->setName(__('Charge Session : ', __FILE__));
+			$info->setName(__('Intensité cosommée par la voiture', __FILE__));
 		}
-		$info->setLogicalId('EVSE_ChargeSession');
+		$info->setLogicalId('vehicle_current_a');
+		$info->setEqLogic_id($this->getId());
+		$info->setType('info');
+		$info->setSubType('numeric');
+		$info->setTemplate('dashboard','line');
+      	$info->setTemplate('mobile','line');
+		$info->setConfiguration('minValue', 0);
+		$info->setConfiguration('maxValue', 32);
+		$info->setIsHistorized(1);
+		$info->setUnite('A');
+		$info->setOrder(2);
+		$info->save();
+		
+		$info = $this->getCmd(null, 'session_energy_wh');
+		if (!is_object($info)) {
+			$info = new WallConnectorCmd();
+			$info->setName(__('Energie Consommée', __FILE__));
+		}
+		$info->setLogicalId('session_energy_wh');
 		$info->setEqLogic_id($this->getId());
 		$info->setType('info');
 		$info->setSubType('numeric');
@@ -183,12 +251,60 @@ class WallConnector extends eqLogic {
 		$info->setOrder(3);
 		$info->save();
 		
-		$info = $this->getCmd(null, 'EVSE_Temp');
+		$info = $this->getCmd(null, 'session_s');
 		if (!is_object($info)) {
 			$info = new WallConnectorCmd();
-			$info->setName(__('Température : ', __FILE__));
+			$info->setName(__('Temps de charge', __FILE__));
 		}
-		$info->setLogicalId('EVSE_Temp');
+		$info->setLogicalId('session_s');
+		$info->setEqLogic_id($this->getId());
+		$info->setType('info');
+		$info->setSubType('numeric');
+		$info->setTemplate('dashboard','line');
+      	$info->setTemplate('mobile','line');
+		$info->setIsHistorized(1);
+		$info->setUnite('s');
+		$info->setOrder(3);
+		$info->save();
+		
+		$info = $this->getCmd(null, 'charging_time_s');
+		if (!is_object($info)) {
+			$info = new WallConnectorCmd();
+			$info->setName(__('Temps de charge total', __FILE__));
+		}
+		$info->setLogicalId('charging_time_s');
+		$info->setEqLogic_id($this->getId());
+		$info->setType('info');
+		$info->setSubType('numeric');
+		$info->setTemplate('dashboard','line');
+      	$info->setTemplate('mobile','line');
+		$info->setIsHistorized(1);
+		$info->setUnite('s');
+		$info->setOrder(3);
+		$info->save();
+		
+		$info = $this->getCmd(null, 'energy_wh');
+		if (!is_object($info)) {
+			$info = new WallConnectorCmd();
+			$info->setName(__('Energie consommée totale', __FILE__));
+		}
+		$info->setLogicalId('energy_wh');
+		$info->setEqLogic_id($this->getId());
+		$info->setType('info');
+		$info->setSubType('numeric');
+		$info->setTemplate('dashboard','line');
+      	$info->setTemplate('mobile','line');
+		$info->setIsHistorized(1);
+		$info->setUnite('Kwh');
+		$info->setOrder(3);
+		$info->save();
+		
+		$info = $this->getCmd(null, 'handle_temp_c');
+		if (!is_object($info)) {
+			$info = new WallConnectorCmd();
+			$info->setName(__('Température poignée', __FILE__));
+		}
+		$info->setLogicalId('handle_temp_c');
 		$info->setEqLogic_id($this->getId());
 		$info->setType('info');
 		$info->setSubType('numeric');
@@ -201,12 +317,12 @@ class WallConnector extends eqLogic {
 		$info->setOrder(4);
 		$info->save();
 		
-		$info = $this->getCmd(null, 'EVSE_Plug');
+		$info = $this->getCmd(null, 'vehicle_connected');
 		if (!is_object($info)) {
 			$info = new WallConnectorCmd();
-			$info->setName(__('Prise : ', __FILE__));
+			$info->setName(__('Voiture branchée', __FILE__));
 		}
-		$info->setLogicalId('EVSE_Plug');
+		$info->setLogicalId('vehicle_connected');
 		$info->setEqLogic_id($this->getId());
 		$info->setType('info');
 		$info->setSubType('string');
@@ -218,12 +334,12 @@ class WallConnector extends eqLogic {
 		$info->save();
 		
 					
-		$info = $this->getCmd(null, 'EVSE_State');
+		$info = $this->getCmd(null, 'contactor_closed');
 		if (!is_object($info)) {
 			$info = new WallConnectorCmd();
-			$info->setName(__('Etat : ', __FILE__));
+			$info->setName(__('Voiture en charge', __FILE__));
 		}
-		$info->setLogicalId('EVSE_State');
+		$info->setLogicalId('contactor_closed');
 		$info->setEqLogic_id($this->getId());
 		$info->setType('info');
 		$info->setSubType('string');
