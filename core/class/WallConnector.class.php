@@ -53,9 +53,7 @@ class WallConnector extends eqLogic {
 	
 	public function GetData() {
 		
-		try {
-          	$Mode = $this->getConfiguration("Mode");
-                    
+		try {                  
 			$WallConnector_IP = $this->getConfiguration("IP");
 			$ch = curl_init();
 			           
@@ -67,12 +65,12 @@ class WallConnector extends eqLogic {
   					CURLOPT_MAXREDIRS => 10,
   					CURLOPT_TIMEOUT => 10,
   					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                  	CURLOPT_IGNORE_CONTENT_LENGTH => 136,
+                  			CURLOPT_IGNORE_CONTENT_LENGTH => 136,
   					CURLOPT_CUSTOMREQUEST => 'GET',
   					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 ]);
-				$response = curl_exec($ch);
-	           	$json_vital = json_decode($response, true);
+			$response = curl_exec($ch);
+	        	$json_vital = json_decode($response, true);
 
               	//Getjson lifetime
               	curl_setopt_array($ch, [
@@ -82,73 +80,80 @@ class WallConnector extends eqLogic {
   					CURLOPT_MAXREDIRS => 10,
   					CURLOPT_TIMEOUT => 10,
   					CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-                  	CURLOPT_IGNORE_CONTENT_LENGTH => 136,
+                  			CURLOPT_IGNORE_CONTENT_LENGTH => 136,
   					CURLOPT_CUSTOMREQUEST => 'GET',
   					CURLOPT_HTTPHEADER => ['Content-Type: application/json'],
                 ]);
-				$response = curl_exec($ch);
-	           	$json_lifetime = json_decode($response, true);
+		$response = curl_exec($ch);
+	           $json_lifetime = json_decode($response, true);
 
          
-              	// Get WallConnector Temperature
-				$handle_temp_c = $json_vital['handle_temp_c'];
-				$this->checkAndUpdateCmd('handle_temp_c', $handle_temp_c);
+          	// Get WallConnector voltage input in V
+		$grid_v = $json_vital['grid_v'];
+		if ($grid_v != 0) {
+			$this->checkAndUpdateCmd('grid_v', $grid_v);
+			
+			// Get WallConnector Temperature
+			$handle_temp_c = $json_vital['handle_temp_c'];
+			$this->checkAndUpdateCmd('handle_temp_c', $handle_temp_c);
               
-              	// Get WallConnector current in A
-				$currentA_a = $json_vital['currentA_a'];
+              		// Get WallConnector current in A
+			$currentA_a = $json_vital['currentA_a'];
           		$this->checkAndUpdateCmd('currentA_a', $currentA_a);
           
           		// Get WallConnector voltage in V
-				$voltageA_v = $json_vital['voltageA_v'];
-				$this->checkAndUpdateCmd('voltageA_v', $voltageA_v);
+			$voltageA_v = $json_vital['voltageA_v'];
+			$this->checkAndUpdateCmd('voltageA_v', $voltageA_v);
               
-          		// Get WallConnector voltage input in V
-				$grid_v = $json_vital['grid_v'];
-				$this->checkAndUpdateCmd('grid_v', $grid_v);
+
 				
 				
-				//Get WallConnector Plug State
-				$vehicle_connected = $json_vital['vehicle_connected'];          
-				if ($vehicle_connected == false) {
-					$this->checkAndUpdateCmd('vehicle_connected', 'Déconnectée');
-				} elseif ($vehicle_connected == true) {
-					$this->checkAndUpdateCmd('vehicle_connected', 'Connectée');
-				}
+			//Get WallConnector Plug State
+			$vehicle_connected = $json_vital['vehicle_connected'];          
+			if ($vehicle_connected == false) {
+				$this->checkAndUpdateCmd('vehicle_connected', 'Déconnectée');
+			} elseif ($vehicle_connected == true) {
+				$this->checkAndUpdateCmd('vehicle_connected', 'Connectée');
+			}
               
           		//Get WallConnector  State
-				$contactor_closed = $json_vital['contactor_closed'];          
-				if ($contactor_closed == false) {
-					$this->checkAndUpdateCmd('contactor_closed', 'Déconnectée');
-				} elseif ($contactor_closed == true) {
-					$this->checkAndUpdateCmd('contactor_closed', 'Connectée');
-				}
+			$contactor_closed = $json_vital['contactor_closed'];          
+			if ($contactor_closed == false) {
+				$this->checkAndUpdateCmd('contactor_closed', 'Déconnectée');
+			} elseif ($contactor_closed == true) {
+				$this->checkAndUpdateCmd('contactor_closed', 'Connectée');
+			}
           
-				// Get WallConnector Charge Session in Kwh
-				$session_energy_wh = $json_vital['session_energy_wh'];
-				$this->checkAndUpdateCmd('session_energy_wh', round($session_energy_wh/1000,2));
+			// Get WallConnector Charge Session in Kwh
+			$session_energy_wh = $json_vital['session_energy_wh'];
+			$this->checkAndUpdateCmd('session_energy_wh', round($session_energy_wh/1000,2));
               
-				// Get WallConnector total Charge in Kwh
-				$energy_wh = $json_lifetime['energy_wh'];
-				$this->checkAndUpdateCmd('energy_wh', round($energy_wh/1000,2));
+			// Get WallConnector total Charge in Kwh
+			$energy_wh = $json_lifetime['energy_wh'];
+			$this->checkAndUpdateCmd('energy_wh', round($energy_wh/1000,2));
 				
-				// Get WallConnector total time in Charge in s
-				$charging_time_s = $json_lifetime['charging_time_s'];
-				$this->checkAndUpdateCmd('charging_time_s', $charging_time_s);
+			// Get WallConnector total time in Charge in s
+			$charging_time_s = $json_lifetime['charging_time_s'];
+			$this->checkAndUpdateCmd('charging_time_s', $charging_time_s);
 				
-				// Get WallConnector time in Charge in s
-				$session_s = $json_vital['session_s'];
-				$this->checkAndUpdateCmd('session_s', $session_s);
+			// Get WallConnector time in Charge in s
+			$session_s = $json_vital['session_s'];
+			$this->checkAndUpdateCmd('session_s', $session_s);
 				
-				// Get WallConnector car current in A
-				$vehicle_current_a = $json_vital['vehicle_current_a'];
-          			$this->checkAndUpdateCmd('vehicle_current_a', $vehicle_current_a);
+			// Get WallConnector car current in A
+			$vehicle_current_a = $json_vital['vehicle_current_a'];
+          		$this->checkAndUpdateCmd('vehicle_current_a', $vehicle_current_a);
 			
-				// Get WallConnector status
-				$evse_state = $json_vital['evse_state'];
-          			$this->checkAndUpdateCmd('evse_state', evse_state);
+			// Get WallConnector status
+			$evse_state = $json_vital['evse_state'];
+          		$this->checkAndUpdateCmd('evse_state', evse_state);
 			
 			log::add('WallConnector', 'debug','Fonction GetData : Récupération des données WallConnector OK !' );
 			return;
+		}else{
+			log::add('WallConnector', 'error','Fonction GetData : Récupération des données WallConnector ignorée car la tension est égale à 0' );
+			return;
+		}
 		} catch (Exception $e) {
 			log::add('WallConnector', 'error', __('Erreur lors de l\'éxecution de GetData ' . ' ' . $e->getMessage()));
 		}
