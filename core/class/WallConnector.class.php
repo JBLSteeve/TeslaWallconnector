@@ -184,7 +184,7 @@ class WallConnector extends eqLogic {
       		$info->setTemplate('mobile','line');
 		$info->setIsHistorized(1);
 		$info->setUnite('V');
-		$info->setOrder(1);
+		$info->setOrder(2);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'voltageA_v');
@@ -200,7 +200,7 @@ class WallConnector extends eqLogic {
       		$info->setTemplate('mobile','line');
 		$info->setIsHistorized(1);
 		$info->setUnite('V');
-		$info->setOrder(2);
+		$info->setOrder(3);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'currentA_a');
@@ -218,7 +218,7 @@ class WallConnector extends eqLogic {
 		$info->setConfiguration('maxValue', 32);
 		$info->setIsHistorized(1);
 		$info->setUnite('A');
-		$info->setOrder(3);
+		$info->setOrder(4);
 		$info->save();
 		
 				$info = $this->getCmd(null, 'vehicle_current_a');
@@ -236,7 +236,7 @@ class WallConnector extends eqLogic {
 		$info->setConfiguration('maxValue', 32);
 		$info->setIsHistorized(1);
 		$info->setUnite('A');
-		$info->setOrder(4);
+		$info->setOrder(5);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'session_energy_wh');
@@ -252,7 +252,7 @@ class WallConnector extends eqLogic {
       		$info->setTemplate('mobile','line');
 		$info->setIsHistorized(1);
 		$info->setUnite('Kwh');
-		$info->setOrder(5);
+		$info->setOrder(6);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'session_s');
@@ -268,7 +268,7 @@ class WallConnector extends eqLogic {
       		$info->setTemplate('mobile','line');
 		$info->setIsHistorized(1);
 		$info->setUnite('s');
-		$info->setOrder(6);
+		$info->setOrder(7);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'charging_time_s');
@@ -284,7 +284,7 @@ class WallConnector extends eqLogic {
       		$info->setTemplate('mobile','line');
 		$info->setIsHistorized(1);
 		$info->setUnite('s');
-		$info->setOrder(7);
+		$info->setOrder(8);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'energy_wh');
@@ -300,7 +300,7 @@ class WallConnector extends eqLogic {
       		$info->setTemplate('mobile','line');
 		$info->setIsHistorized(1);
 		$info->setUnite('Kwh');
-		$info->setOrder(8);
+		$info->setOrder(9);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'handle_temp_c');
@@ -318,7 +318,7 @@ class WallConnector extends eqLogic {
 		$info->setConfiguration('maxValue', 80);
 		$info->setIsHistorized(1);
 		$info->setUnite('°C');
-		$info->setOrder(9);
+		$info->setOrder(10);
 		$info->save();
 		
 		$info = $this->getCmd(null, 'vehicle_connected');
@@ -334,7 +334,7 @@ class WallConnector extends eqLogic {
       		$info->setTemplate('mobile','default');
 		$info->setIsHistorized(0);
 		$info->setIsVisible(1);
-		$info->setOrder(10);
+		$info->setOrder(11);
 		$info->save();
 		
 					
@@ -351,7 +351,7 @@ class WallConnector extends eqLogic {
       		$info->setTemplate('mobile','default');
 		$info->setIsHistorized(0);
 		$info->setIsVisible(1);
-		$info->setOrder(11);
+		$info->setOrder(12);
 		$info->save();
 
 	    	$info = $this->getCmd(null, 'evse_state');
@@ -367,7 +367,7 @@ class WallConnector extends eqLogic {
       		$info->setTemplate('mobile','line');
 		$info->setIsHistorized(1);
 		$info->setIsVisible(1);
-		$info->setOrder(12);
+		$info->setOrder(13);
 		$info->save();
 	    
 		$refresh = $this->getCmd(null, 'refresh');
@@ -379,7 +379,7 @@ class WallConnector extends eqLogic {
 		$refresh->setLogicalId('refresh');
 		$refresh->setType('action');
 		$refresh->setSubType('other');
-		$refresh->setOrder(50);
+		$refresh->setOrder(1);
 		$refresh->save();
       
      	foreach (self::byType('WallConnector') as $WallConnector) {//parcours tous les équipements du plugin WallConnector
