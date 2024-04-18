@@ -146,7 +146,7 @@ class WallConnector extends eqLogic {
 			
 			// Get WallConnector status
 			$evse_state = $json_vital['evse_state'];
-          		$this->checkAndUpdateCmd('evse_state', evse_state);
+          		$this->checkAndUpdateCmd('evse_state', $evse_state);
 			
 			log::add('WallConnector', 'debug','Fonction GetData : Récupération des données WallConnector OK !' );
 			return;
