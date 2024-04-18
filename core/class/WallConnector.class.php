@@ -90,7 +90,7 @@ class WallConnector extends eqLogic {
          
           	// Get WallConnector voltage input in V
 		$grid_v = $json_vital['grid_v'];
-		if ($grid_v != 0) {
+		if (intval($grid_v) != 0) {
 			$this->checkAndUpdateCmd('grid_v', $grid_v);
 			
 			// Get WallConnector Temperature
