@@ -87,10 +87,14 @@ class WallConnector extends eqLogic {
 		$response = curl_exec($ch);
 	           $json_lifetime = json_decode($response, true);
 
-         
+         // ping
+        $fp = fsockopen($WallConnector_IP, 80, $errno, $errstr, 30);
+ 		if($fp) {
+    			log::add('WallConnector', 'debug','Fonction GetData : ping OK' );
+
+          
           	// Get WallConnector voltage input in V
-		$grid_v = $json_vital['grid_v'];
-		if (intval($grid_v) != 0) {
+			$grid_v = $json_vital['grid_v'];
 			$this->checkAndUpdateCmd('grid_v', $grid_v);
 			
 			// Get WallConnector Temperature
@@ -151,7 +155,7 @@ class WallConnector extends eqLogic {
 			log::add('WallConnector', 'debug','Fonction GetData : Récupération des données WallConnector OK !' );
 			return;
 		}else{
-			log::add('WallConnector', 'error','Fonction GetData : Récupération des données WallConnector ignorée car la tension est égale à 0' );
+			log::add('WallConnector', 'error','Fonction GetData : Ping KO, les données sont ignorées' );
 			return;
 		}
 		} catch (Exception $e) {
